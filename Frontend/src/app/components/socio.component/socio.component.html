@@ -1,0 +1,143 @@
+<main class="py-5" style="background-color: #f8f9fa; min-height: 100vh;">
+    
+    <div class="container text-center mb-5 py-4 px-4 rounded-4 shadow"
+        style="background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%); color: white;">
+        <i class="bi bi-people-fill mb-3" style="font-size: 3rem; color: #ffffff;"></i>
+        <h1 class="display-5 fw-bold mb-3">Gestión de Socios</h1>
+        <p class="mx-auto" style="max-width: 600px; font-size: 1.1rem; color: #f8f9fa;">
+            Administre las altas, bajas y modificaciones de los socios del club.
+        </p>
+    </div>
+
+    <div class="container">
+        <div class="row g-4">
+            
+            <div class="col-lg-4">
+                <div class="card shadow-sm border-0 rounded-4 overflow-hidden">
+                    <div class="card-header text-white py-3" 
+                         [ngClass]="accion === 0 ? 'bg-primary' : 'bg-warning text-dark'">
+                        <h5 class="mb-0 fw-bold" *ngIf="accion === 0"><i class="bi bi-person-plus-fill me-2"></i>Dar de Alta</h5>
+                        <h5 class="mb-0 fw-bold" *ngIf="accion === 1"><i class="bi bi-pencil-square me-2"></i>Modificar Socio</h5>
+                    </div>
+                    
+                    <div class="card-body bg-white p-4">
+                        <form #formSocio="ngForm" (ngSubmit)="guardarSocio(formSocio)">
+                            
+                            <div class="mb-3">
+                                <label class="form-label small fw-bold text-muted">Nombre *</label>
+                                <input type="text" class="form-control rounded-3" name="nombre" [(ngModel)]="socioActual.nombre" required>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label small fw-bold text-muted">Apellido *</label>
+                                <input type="text" class="form-control rounded-3" name="apellido" [(ngModel)]="socioActual.apellido" required>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label small fw-bold text-muted">DNI *</label>
+                                <input type="text" class="form-control rounded-3" name="dni" [(ngModel)]="socioActual.dni" required>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label small fw-bold text-muted">Nro. de Socio *</label>
+                                <input type="number" class="form-control rounded-3" name="numeroSocio" [(ngModel)]="socioActual.numeroSocio" required min="1">
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label small fw-bold text-muted">URL de la Foto</label>
+                                <input type="text" class="form-control rounded-3" name="foto" [(ngModel)]="socioActual.foto" placeholder="http://...">
+                            </div>
+
+                            <div class="mb-4 form-check form-switch">
+                                <input type="checkbox" class="form-check-input" id="activo" name="activo" [(ngModel)]="socioActual.activo">
+                                <label class="form-check-label fw-bold" for="activo" 
+                                       [ngClass]="socioActual.activo ? 'text-success' : 'text-danger'">
+                                    {{ socioActual.activo ? 'Socio Activo' : 'Socio Pasivo' }}
+                                </label>
+                            </div>
+
+                            <div class="d-grid gap-2">
+                                <button type="submit" class="btn btn-lg fw-bold rounded-3 shadow-sm" 
+                                        [ngClass]="accion === 0 ? 'btn-primary' : 'btn-warning'" 
+                                        [disabled]="formSocio.invalid">
+                                    <i class="bi" [ngClass]="accion === 0 ? 'bi-check-circle' : 'bi-arrow-repeat'"></i> 
+                                    {{ accion === 0 ? 'Registrar Socio' : 'Actualizar Cambios' }}
+                                </button>
+                                <button type="button" class="btn btn-outline-secondary fw-bold rounded-3" (click)="limpiarFormulario(formSocio)">
+                                    Cancelar
+                                </button>
+                            </div>
+
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-8">
+                <div class="card shadow-sm border-0 rounded-4 overflow-hidden">
+                    <div class="card-header bg-dark text-white py-3 d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0 fw-bold"><i class="bi bi-list-columns-reverse me-2"></i>Listado de Socios</h5>
+                        <button class="btn btn-sm fw-bold rounded-pill px-3 shadow-sm" 
+                                [class.btn-outline-light]="!verSoloActivos" 
+                                [class.btn-light]="verSoloActivos" 
+                                [class.text-dark]="verSoloActivos"
+                                (click)="toggleFiltroActivos()">
+                            <i class="bi bi-funnel-fill me-1"></i>
+                            {{ verSoloActivos ? 'Ver Todos' : 'Ver Solo Activos' }}
+                        </button>
+                    </div>
+                    
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0 bg-white">
+                            <thead class="table-light">
+                                <tr>
+                                    <th scope="col" style="width: 10%">Nro</th>
+                                    <th scope="col" style="width: 35%">Socio</th>
+                                    <th scope="col" style="width: 20%">DNI</th>
+                                    <th scope="col" style="width: 15%">Estado</th>
+                                    <th scope="col" style="width: 20%" class="text-center">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let socio of socios">
+                                    <td class="fw-bold text-muted">#{{ socio.numeroSocio }}</td>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <img [src]="socio.foto || 'https://via.placeholder.com/150'" 
+                                                 class="rounded-circle me-3 border" style="width: 45px; height: 45px; object-fit: cover;">
+                                            <div>
+                                                <span class="fw-bold text-dark d-block fs-6">{{ socio.apellido }}</span>
+                                                <small class="text-muted">{{ socio.nombre }}</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="text-muted">{{ socio.dni }}</td>
+                                    <td>
+                                        <span class="badge rounded-pill" [ngClass]="socio.activo ? 'bg-success' : 'bg-danger'">
+                                            {{ socio.activo ? 'Activo' : 'Pasivo' }}
+                                        </span>
+                                    </td>
+                                    <td class="text-center">
+                                        <button class="btn btn-sm btn-warning rounded-circle shadow-sm me-2" (click)="seleccionarSocio(socio)" title="Editar">
+                                            <i class="bi bi-pencil-fill"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-danger rounded-circle shadow-sm" *ngIf="socio.id" (click)="eliminarSocio(socio.id)" title="Eliminar">
+                                            <i class="bi bi-trash-fill"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr *ngIf="socios.length === 0">
+                                    <td colspan="5" class="text-center text-muted py-5">
+                                        <i class="bi bi-info-circle fs-2 mb-2 d-block text-secondary"></i>
+                                        <span class="fw-semibold">No se encontraron socios registrados.</span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</main>

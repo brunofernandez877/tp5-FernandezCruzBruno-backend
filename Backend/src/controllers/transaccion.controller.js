@@ -1,39 +1,52 @@
-// backend/src/controllers/transaccion.controller.js
-const Transaccion = require('../models/transaccion.model');
-const { Op } = require('sequelize'); // Importante para filtros complejos
+const Transaccion = require('./../../src/models/transaccion.model');
 const transaccionCtrl = {};
 
-// Crear log
+// 1. Dar de alta una Transaccion (POST)
 transaccionCtrl.createTransaccion = async (req, res) => {
     try {
-        await Transaccion.create(req.body);
-        res.status(201).json({ status: '1', msg: 'Transacción registrada.' });
+        const transaccion = await Transaccion.create(req.body);
+        res.status(201).json({ status: '1', msg: 'Transacción registrada', data: transaccion });
     } catch (error) {
-        res.status(400).json({ status: '0', msg: 'Error al registrar.' });
+        res.status(400).json({ status: '0', msg: 'Error al guardar', error: error.message });
     }
 };
 
-// Recuperar TODAS o FILTRAR
+// 2. Recuperar TODAS las Transacciones Registradas (GET)
 transaccionCtrl.getTransacciones = async (req, res) => {
     try {
-        let whereClause = {};
-
-        // Filtro por Email (GET /api/transaccion?email=ejemplo@mail.com)
-        if (req.query.email) {
-            whereClause.emailCliente = req.query.email;
-        }
-
-        // Filtro por combinación de idiomas (GET /api/transaccion?origen=es&destino=en)
-        if (req.query.origen && req.query.destino) {
-            whereClause.idiomaOrigen = req.query.origen;
-            whereClause.idiomaDestino = req.query.destino;
-        }
-
-        const transacciones = await Transaccion.findAll({ where: whereClause });
+        const transacciones = await Transaccion.findAll();
         res.json(transacciones);
     } catch (error) {
-        res.status(500).json({ status: '0', msg: 'Error al recuperar transacciones.' });
+        res.status(500).json({ status: '0', msg: 'Error al obtener transacciones' });
     }
 };
 
+// 3. Recuperar histórico de un cliente usando email (GET params)
+transaccionCtrl.getTransaccionesByEmail = async (req, res) => {
+    try {
+        const transacciones = await Transaccion.findAll({
+            where: { emailCliente: req.params.email }
+        });
+        res.json(transacciones);
+    } catch (error) {
+        res.status(500).json({ status: '0', msg: 'Error al filtrar por email' });
+    }
+};
+
+// 4. Recuperar transacciones por idiomas de origen y destino (GET params)
+transaccionCtrl.getTransaccionesByIdiomas = async (req, res) => {
+    try {
+        const transacciones = await Transaccion.findAll({
+            where: { 
+                idiomaOrigen: req.params.origen,
+                idiomaDestino: req.params.destino
+            }
+        });
+        res.json(transacciones);
+    } catch (error) {
+        res.status(500).json({ status: '0', msg: 'Error al filtrar por idiomas' });
+    }
+};
+
+module.exports = transaccionCtrl;
 module.exports = transaccionCtrl;

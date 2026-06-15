@@ -1,0 +1,116 @@
+<main class="py-5" style="background-color: #f8f9fa; min-height: 100vh;">
+    <div class="container text-center mb-5 py-4 px-4 rounded-4 shadow"
+        style="background: linear-gradient(135deg, #198754 0%, #146c43 100%); color: white;">
+        <i class="bi bi-translate mb-3" style="font-size: 3rem;"></i>
+        <h1 class="display-5 fw-bold mb-3">Logs de Traducción</h1>
+        <p class="mx-auto" style="max-width: 600px; font-size: 1.1rem; color: #f8f9fa;">
+            Registro histórico de operaciones del sistema de traducciones.
+        </p>
+    </div>
+
+    <div class="container">
+        <div class="card shadow-sm border-0 rounded-4 p-4 mb-4 bg-white">
+            <h5 class="fw-bold text-dark mb-3"><i class="bi bi-search me-2 text-success"></i>Búsquedas Personalizadas</h5>
+            <div class="row g-3 align-items-end">
+                <div class="col-12 col-md-4">
+                    <label class="form-label small fw-bold text-muted">Filtrar por Cliente (Email)</label>
+                    <div class="input-group">
+                        <input type="email" class="form-control" [(ngModel)]="filtroEmail" placeholder="ejemplo@correo.com">
+                        <button class="btn btn-dark fw-bold" (click)="filtrarPorEmail()">Buscar</button>
+                    </div>
+                </div>
+                <div class="col-12 col-md-6">
+                    <label class="form-label small fw-bold text-muted">Filtrar por Idiomas (Origen - Destino)</label>
+                    <div class="input-group">
+                        <input type="text" class="form-control" [(ngModel)]="filtroOrigen" placeholder="Ej: es-español">
+                        <input type="text" class="form-control" [(ngModel)]="filtroDestino" placeholder="Ej: en-ingles">
+                        <button class="btn btn-dark fw-bold" (click)="filtrarPorIdiomas()">Buscar</button>
+                    </div>
+                </div>
+                <div class="col-12 col-md-2 d-grid">
+                    <button class="btn btn-outline-secondary fw-bold shadow-sm" (click)="limpiarFiltros()">Limpiar</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-lg-4">
+                <div class="card shadow-sm border-0 rounded-4 overflow-hidden">
+                    <div class="card-header bg-success text-white py-3">
+                        <h5 class="mb-0 fw-bold"><i class="bi bi-plus-circle me-2"></i>Registrar Log</h5>
+                    </div>
+                    <div class="card-body bg-white p-4">
+                        <form #formTransaccion="ngForm" (ngSubmit)="guardarTransaccion(formTransaccion)">
+                            <div class="mb-3">
+                                <label class="form-label small fw-bold text-muted">Email Cliente *</label>
+                                <input type="email" class="form-control rounded-3" name="emailCliente" [(ngModel)]="transaccionActual.emailCliente" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label small fw-bold text-muted">Idioma Origen *</label>
+                                <input type="text" class="form-control rounded-3" name="idiomaOrigen" [(ngModel)]="transaccionActual.idiomaOrigen" required placeholder="Ej: es-español">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label small fw-bold text-muted">Texto Origen *</label>
+                                <textarea class="form-control rounded-3" name="textoOrigen" [(ngModel)]="transaccionActual.textoOrigen" required rows="2"></textarea>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label small fw-bold text-muted">Idioma Destino *</label>
+                                <input type="text" class="form-control rounded-3" name="idiomaDestino" [(ngModel)]="transaccionActual.idiomaDestino" required placeholder="Ej: en-ingles">
+                            </div>
+                            <div class="mb-4">
+                                <label class="form-label small fw-bold text-muted">Texto Destino *</label>
+                                <textarea class="form-control rounded-3" name="textoDestino" [(ngModel)]="transaccionActual.textoDestino" required rows="2"></textarea>
+                            </div>
+                            <div class="d-grid">
+                                <button type="submit" class="btn btn-success btn-lg fw-bold rounded-3 shadow-sm" [disabled]="formTransaccion.invalid">
+                                    <i class="bi bi-save2"></i> Guardar Transacción
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-8">
+                <div class="card shadow-sm border-0 rounded-4 overflow-hidden">
+                    <div class="card-header bg-dark text-white py-3">
+                        <h5 class="mb-0 fw-bold"><i class="bi bi-list-task me-2"></i>Historial de Operaciones</h5>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0 bg-white">
+                            <thead class="table-light">
+                                <tr>
+                                    <th scope="col">ID</th>
+                                    <th scope="col">Cliente</th>
+                                    <th scope="col">Conversión</th>
+                                    <th scope="col">Textos</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let t of transacciones">
+                                    <td class="fw-bold text-muted">#{{ t.id }}</td>
+                                    <td class="text-primary fw-semibold">{{ t.emailCliente }}</td>
+                                    <td>
+                                        <span class="badge bg-secondary me-1">{{ t.idiomaOrigen }}</span>
+                                        <i class="bi bi-arrow-right text-muted mx-1"></i>
+                                        <span class="badge bg-success">{{ t.idiomaDestino }}</span>
+                                    </td>
+                                    <td>
+                                        <small class="d-block text-muted"><strong>Origen:</strong> {{ t.textoOrigen | slice:0:20 }}...</small>
+                                        <small class="d-block text-muted"><strong>Destino:</strong> {{ t.textoDestino | slice:0:20 }}...</small>
+                                    </td>
+                                </tr>
+                                <tr *ngIf="transacciones.length === 0">
+                                    <td colspan="4" class="text-center text-muted py-5">
+                                        <i class="bi bi-inbox fs-2 mb-2 d-block text-secondary"></i>
+                                        <span class="fw-semibold">No se encontraron registros de transacciones.</span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
