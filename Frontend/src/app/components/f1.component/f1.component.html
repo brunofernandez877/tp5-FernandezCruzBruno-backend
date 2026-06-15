@@ -1,0 +1,162 @@
+<main class="py-5" style="background-color: #f8f9fa; min-height: 100vh;">
+
+    <div class="container text-center mb-5 py-5 px-4 rounded-4 shadow"
+        style="background: linear-gradient(135deg, #e10600 0%, #a80400 100%); color: white;">
+        <i class="bi bi-flag-fill mb-3" style="font-size: 3rem; color: #ffffff;"></i>
+        <h1 class="display-5 fw-bold mb-3">Portal de Datos Fórmula 1</h1>
+        <p class="mx-auto" style="max-width: 600px; font-size: 1.1rem; color: #f8f9fa;">
+            Consulte el calendario de carreras, sesiones de prácticas y las clasificaciones oficiales directamente desde los servidores de Live Motorsport.
+        </p>
+    </div>
+
+    <div class="container">
+        
+        <div class="card shadow-sm border-0 rounded-4 p-4 mb-4 bg-white">
+            <h5 class="fw-bold text-dark mb-3"><i class="bi bi-search me-2 text-danger"></i>Panel de Consultas</h5>
+            <div class="row g-3 align-items-end">
+                <div class="col-12 col-md-4">
+                    <label class="form-label small fw-bold text-muted">Ingrese el Año (Temporada)</label>
+                    <input type="number" class="form-control form-control-lg rounded-3" [(ngModel)]="anioInput" placeholder="Ej: 2020">
+                </div>
+                <div class="col-12 col-md-4 d-grid">
+                    <button class="btn btn-dark btn-lg fw-bold rounded-3 shadow-sm" (click)="consultarCarreras()">
+                        <i class="bi bi-calendar-check me-2 text-danger"></i>Consultar Carreras
+                    </button>
+                </div>
+                <div class="col-12 col-md-4 d-grid">
+                    <button class="btn btn-outline-danger btn-lg fw-bold rounded-3 shadow-sm" (click)="consultarConstructores()">
+                        <i class="bi bi-trophy-fill me-2"></i>Clasificación Constructores
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <section class="mb-4" *ngIf="mostrarConstructores">
+            <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+                <div class="card-header bg-dark text-white py-3">
+                    <h6 class="mb-0 fw-bold text-uppercase" style="letter-spacing: 1px;">
+                        <i class="bi bi-shield-shaded text-danger me-2"></i> Extremos del Campeonato de Constructores ({{ anioInput }})
+                    </h6>
+                </div>
+                <div class="card-body bg-light p-4">
+                    <div class="row g-4 text-center">
+                        <div class="col-12 col-md-6 border-end-md">
+                            <div class="p-3 bg-white rounded-3 shadow-sm border-top border-5 border-success">
+                                <span class="badge bg-success mb-2">1º PUESTO (LÍDER)</span>
+                                <h4 class="fw-bold text-dark m-0">{{ primerConstructor?.team_name }}</h4>
+                                <p class="text-muted small mb-0 mt-1">Puntos Totales: <span class="fw-bold">{{ primerConstructor?.points }}</span></p>
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-6">
+                            <div class="p-3 bg-white rounded-3 shadow-sm border-top border-5 border-secondary">
+                                <span class="badge bg-secondary mb-2">ÚLTIMO PUESTO</span>
+                                <h4 class="fw-bold text-dark m-0">{{ ultimoConstructor?.team_name }}</h4>
+                                <p class="text-muted small mb-0 mt-1">Puntos Totales: <span class="fw-bold">{{ ultimoConstructor?.points }}</span></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="card border-0 shadow-sm rounded-4 overflow-hidden" *ngIf="races.length > 0">
+            <div class="card-header bg-secondary text-white py-3">
+                <h5 class="mb-0 fw-bold"><i class="bi bi-list-ol me-2"></i> Listado de Carreras Encontradas</h5>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0 bg-white">
+                    <thead class="table-dark">
+                        <tr>
+                            <th scope="col" style="width: 15%">Race ID</th>
+                            <th scope="col" style="width: 45%">Carrera (race)</th>
+                            <th scope="col" style="width: 40%">Sesiones (season)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let race of races">
+                            <td class="fw-bold text-muted">#{{ race.race_id }}</td>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div class="bg-light border rounded-3 p-2 me-3 text-center" style="width: 40px; height: 40px;">
+                                        <i class="bi bi-geo-alt-fill text-danger"></i>
+                                    </div>
+                                    <div>
+                                        <span class="fw-bold text-dark d-block fs-6">{{ race.name }}</span>
+                                        <small class="text-muted">{{ race.track }} ({{ race.country }})</small>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="list-group list-group-flush">
+                                    <div class="list-group-item d-flex justify-content-between align-items-center py-2 px-0 bg-transparent border-0" 
+                                         *ngFor="let session of race.sessions">
+                                        <span class="small text-dark fw-semibold">
+                                            <i class="bi bi-stopwatch me-1 text-muted"></i> Id: {{ session.id }} - {{ session.session_name }}
+                                        </span>
+                                        <button class="btn btn-sm btn-danger fw-bold rounded-pill px-3 shadow-sm"
+                                            (click)="verPosiciones(session.id, session.session_name)"
+                                            data-bs-toggle="modal" data-bs-target="#posicionesModalF1">
+                                            <i class="bi bi-eye-fill me-1"></i> Ver Posiciones
+                                        </button>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+    </div>
+</main>
+
+<div class="modal fade" id="posicionesModalF1" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+            
+            <div class="modal-header text-white" style="background: linear-gradient(135deg, #212529 0%, #000000 100%); border-bottom: 3px solid #e10600;">
+                <h5 class="modal-title fw-bold">
+                    <i class="bi bi-trophy text-warning me-2"></i> Pilotos - Clasificación de {{ sessionActualName }}
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body bg-light p-0">
+                
+                <div *ngIf="cargandoModal" class="text-center py-5">
+                    <div class="spinner-border text-danger mb-3" style="width: 3rem; height: 3rem;" role="status"></div>
+                    <h6 class="text-muted fw-bold">Consultando telemetría de la sesión...</h6>
+                </div>
+
+                <div class="list-group list-group-flush" *ngIf="!cargandoModal && pilotosPosiciones.length > 0">
+                    <div class="list-group-item bg-white border-bottom d-flex align-items-center py-3 px-4"
+                        *ngFor="let item of pilotosPosiciones">
+                        
+                        <div class="rounded-circle d-flex justify-content-center align-items-center fw-bold shadow-sm me-3"
+                            [ngClass]="{'bg-warning text-dark': item.position === 1, 'bg-secondary text-white': item.position === 2, 'bg-dark text-white': item.position > 2}"
+                            style="width: 35px; height: 35px; font-size: 0.9rem;">
+                            {{ item.position }}
+                        </div>
+
+                        <div class="flex-grow-1">
+                            <span class="fw-bold text-dark fs-6 d-block">{{ item.name }}</span>
+                            <small class="text-muted text-uppercase fw-semibold">{{ item.team_name }}</small>
+                        </div>
+
+                    </div>
+                </div>
+
+                <div *ngIf="!cargandoModal && pilotosPosiciones.length === 0" class="text-center py-5 text-muted">
+                    <i class="bi bi-exclamation-triangle fs-2 text-warning mb-2"></i>
+                    <p class="mb-0 fw-semibold">No se encontraron registros de posiciones para esta sesión.</p>
+                </div>
+
+            </div>
+
+            <div class="modal-footer bg-white border-top-0">
+                <button type="button" class="btn btn-outline-dark fw-bold rounded-pill px-4" data-bs-dismiss="modal">Cerrar</button>
+            </div>
+
+        </div>
+    </div>
+</div>

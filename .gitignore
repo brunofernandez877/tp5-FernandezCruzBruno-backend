@@ -1,0 +1,26 @@
+# --- Ignorar dependencias de Node.js (Backend y Frontend) ---
+**/node_modules
+**/dist
+**/build
+**/out-tsc
+**/package-lock.json
+**/yarn.lock
+
+# --- Ignorar archivos de configuración específicos ---
+.env
+.DS_Store
+*.log
+*.tmp
+
+# --- Ignorar configuración de Angular ---
+.angular/
+.cache/
+
+# --- Ignorar archivos de bases de datos o IDEs ---
+.vscode/
+.idea/
+*.sqlite
+*.sqlite-journal
+
+# --- Ignorar archivos generados por Swagger (si decides no subirlos) ---
+swagger-output.json
