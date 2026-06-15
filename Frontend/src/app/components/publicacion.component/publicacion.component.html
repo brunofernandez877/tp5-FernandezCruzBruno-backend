@@ -1,0 +1,115 @@
+<main class="py-5" style="background-color: #f8f9fa; min-height: 100vh;">
+    <div class="container text-center mb-5 py-4 px-4 rounded-4 shadow"
+        style="background: linear-gradient(135deg, #6f42c1 0%, #46287a 100%); color: white;">
+        <i class="bi bi-newspaper mb-3" style="font-size: 3rem;"></i>
+        <h1 class="display-5 fw-bold mb-3">Blog y Publicaciones</h1>
+    </div>
+
+    <div class="container">
+        <div class="card shadow-sm border-0 rounded-4 p-4 mb-4">
+            <h5 class="fw-bold mb-3 text-purple"><i class="bi bi-search me-2"></i>Búsqueda Combinada</h5>
+            <div class="row g-3 align-items-end">
+                <div class="col-md-6">
+                    <label class="form-label small fw-bold">Parte del Título</label>
+                    <input type="text" class="form-control" [(ngModel)]="filtroTitulo" placeholder="Ej: Novedades">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label small fw-bold d-block">Estado</label>
+                    <div class="form-check form-switch pt-2">
+                        <input class="form-check-input" type="checkbox" [(ngModel)]="filtroVigente">
+                        <label class="form-check-label">{{ filtroVigente ? 'Solo Vigentes' : 'No Vigentes' }}</label>
+                    </div>
+                </div>
+                <div class="col-md-3 d-grid gap-2 d-md-flex justify-content-md-end">
+                    <button class="btn btn-dark fw-bold" (click)="buscarCombinado()">Buscar</button>
+                    <button class="btn btn-outline-secondary" (click)="limpiar()">Limpiar</button>
+                </div>
+            </div>
+        </div>
+        <div class="col-12" *ngIf="accion === 1">
+        <button type="button" class="btn btn-outline-primary w-40 fw-bold" (click)="limpiar(formPub)">
+            <i class="bi bi-file-earmark-plus"></i> Volver
+        </button>
+    </div>
+
+
+
+        <div class="row g-4">
+            <div class="col-lg-4">
+                <div class="card shadow-sm border-0 rounded-4">
+                    <div class="card-header text-white py-3" [ngClass]="accion===0?'bg-primary':'bg-warning text-dark'">
+                        <h5 class="mb-0 fw-bold">{{ accion===0 ? 'Crear Publicación' : 'Editar Publicación' }}</h5>
+                    </div>
+                    
+                    <div class="card-body p-4">
+                        <form #formPub="ngForm" (ngSubmit)="guardarPublicacion(formPub)">
+                            <div class="mb-3">
+                                <label class="form-label small fw-bold">Título *</label>
+                                <input type="text" class="form-control" name="titulo" [(ngModel)]="pubActual.titulo" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label small fw-bold">Empleado Autor *</label>
+                                <select class="form-select" name="empleado" [(ngModel)]="pubActual.empleado" required>
+                                    <option [ngValue]="null" disabled>Seleccione un autor...</option>
+                                    <option *ngFor="let emp of empleados" [ngValue]="emp">
+                                        {{ emp.apellido }}, {{ emp.nombre }}
+                                    </option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label small fw-bold">Fecha (String) *</label>
+                                <input type="text" class="form-control" name="fecha" [(ngModel)]="pubActual.fechaPublicacion" required placeholder="Ej: 2024-05-15">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label small fw-bold">Contenido *</label>
+                                <textarea class="form-control" name="contenido" [(ngModel)]="pubActual.contenido" required rows="3"></textarea>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label small fw-bold">Imagen (Base64)</label>
+                                <input type="file" class="form-control" accept="image/*" (change)="onFileSelected($event)">
+                                <img *ngIf="pubActual.imagenAsociada" [src]="pubActual.imagenAsociada" class="img-thumbnail mt-2" style="max-height: 100px;">
+                            </div>
+                            <div class="mb-3 form-check form-switch">
+                                <input class="form-check-input" type="checkbox" name="vigente" [(ngModel)]="pubActual.vigente">
+                                <label class="form-check-label fw-bold">Publicación Vigente</label>
+                            </div>
+                            <button type="submit" class="btn w-100 fw-bold" [ngClass]="accion===0?'btn-primary':'btn-warning'" [disabled]="formPub.invalid">
+                                Guardar
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-8">
+                <div class="row g-3">
+                    <div class="col-md-6" *ngFor="let pub of publicaciones">
+                        <div class="card h-100 shadow-sm border-0 rounded-4">
+                            <img *ngIf="pub.imagenAsociada" [src]="pub.imagenAsociada" class="card-img-top" style="height: 180px; object-fit: cover;">
+                            <div *ngIf="!pub.imagenAsociada" class="card-img-top bg-secondary text-white d-flex align-items-center justify-content-center" style="height: 180px;">
+                                <span>Sin Imagen</span>
+                            </div>
+                            <div class="card-body">
+                                <span class="badge mb-2" [ngClass]="pub.vigente ? 'bg-success' : 'bg-danger'">
+                                    {{ pub.vigente ? 'Vigente' : 'Oculta' }}
+                                </span>
+                                <h5 class="card-title fw-bold text-truncate" [title]="pub.titulo">{{ pub.titulo }}</h5>
+                                <p class="card-text text-muted small mb-2"><i class="bi bi-calendar me-1"></i>{{ pub.fechaPublicacion }}</p>
+                                <p class="card-text text-primary small fw-semibold"><i class="bi bi-person-badge me-1"></i>{{ pub.Empleado?.apellido }}, {{ pub.Empleado?.nombre }}</p>
+                                <p class="card-text border-top pt-2 mt-2" style="font-size: 0.9rem;">{{ pub.contenido | slice:0:80 }}...</p>
+                            </div>
+                            <div class="card-footer bg-white border-0 text-end pb-3">
+                                <button class="btn btn-sm btn-warning me-2" (click)="seleccionar(pub)"><i class="bi bi-pencil"></i></button>
+                                <button class="btn btn-sm btn-danger" (click)="eliminar(pub.id)"><i class="bi bi-trash"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                    <div *ngIf="publicaciones.length === 0" class="col-12 text-center text-muted py-5">
+                        <i class="bi bi-inbox fs-1 d-block mb-3"></i>
+                        No hay publicaciones que coincidan.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>

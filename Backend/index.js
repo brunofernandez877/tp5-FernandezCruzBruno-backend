@@ -10,6 +10,8 @@ app.use('/api/agente', require('./src/routes/agente.route.js'));
 app.use('/api/sector', require('./src/routes/sector.route.js'));
 app.use('/api/socio', require('./src/routes/socio.route.js'));
 app.use('/api/transaccion', require('./src/routes/transaccion.route.js'));
+app.use('/api/empleado', require('./src/routes/empleado.route.js'));
+app.use('/api/publicacion', require('./src/routes/publicacion.route.js'));
 //setting
 app.set('port', process.env.PORT || 3000);
 // Sincronizar Base de Datos y arrancar el servidor

@@ -1,4 +1,4 @@
-const Agente = require('./../../src/models/agente.model'); // Asegúrate de usar la ruta correcta a tu modelo
+const Agente = require('../models/agente.model'); // Asegúrate de usar la ruta correcta a tu modelo
 const agenteCtrl = {};
 // Obtener todos los agentes
 agenteCtrl.getAgentes = async (req, res) => {

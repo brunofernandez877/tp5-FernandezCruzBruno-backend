@@ -43,7 +43,23 @@
                         <form #formTransaccion="ngForm" (ngSubmit)="guardarTransaccion(formTransaccion)">
                             <div class="mb-3">
                                 <label class="form-label small fw-bold text-muted">Email Cliente *</label>
-                                <input type="email" class="form-control rounded-3" name="emailCliente" [(ngModel)]="transaccionActual.emailCliente" required>
+                                <input type="email" 
+                                    class="form-control rounded-3" 
+                                    name="emailCliente" 
+                                    [(ngModel)]="transaccionActual.emailCliente" 
+                                    #emailInput="ngModel"
+                                    required 
+                                    pattern="^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$"
+                                    placeholder="ejemplo@correo.com">
+                                    
+                                <div *ngIf="emailInput.invalid && (emailInput.dirty || emailInput.touched)" class="text-danger small mt-1">
+                                    <div *ngIf="emailInput.errors?.['required']">
+                                        <i class="bi bi-exclamation-circle"></i> El correo es obligatorio.
+                                    </div>
+                                    <div *ngIf="emailInput.errors?.['pattern']">
+                                        <i class="bi bi-exclamation-circle"></i> Debe ser un correo válido (ej. usuario@dominio.com).
+                                    </div>
+                                </div>
                             </div>
                             <div class="mb-3">
                                 <label class="form-label small fw-bold text-muted">Idioma Origen *</label>

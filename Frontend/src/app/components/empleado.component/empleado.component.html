@@ -1,0 +1,189 @@
+<main class="py-5" style="background-color: #f8f9fa; min-height: 100vh;">
+    
+    <div class="container text-center mb-5 py-4 px-4 rounded-4 shadow"
+        style="background: linear-gradient(135deg, #0dcaf0 0%, #087990 100%); color: white;">
+        <i class="bi bi-person-badge-fill mb-3" style="font-size: 3rem;"></i>
+        <h1 class="display-5 fw-bold mb-3">Gestión de Empleados</h1>
+        <p class="mx-auto" style="max-width: 600px; font-size: 1.1rem; color: #f8f9fa;">
+            Registre a los autores antes de crear sus publicaciones.
+        </p>
+    </div>
+
+    <div class="container">
+        <div class="row g-4">
+            
+            <div class="col-lg-4">
+                <div class="card shadow-sm border-0 rounded-4 overflow-hidden">
+                    <div class="card-header bg-info text-white py-3">
+                        <h5 class="mb-0 fw-bold"><i class="bi bi-person-plus-fill me-2"></i>Alta de Empleado</h5>
+                    </div>
+                    
+                    <div class="card-body bg-white p-4">
+                        <form #formEmpleado="ngForm" (ngSubmit)="guardarEmpleado(formEmpleado)">
+                            
+                            <div class="mb-3">
+                                <label class="form-label small fw-bold text-muted">Nombre *</label>
+                                <input type="text" class="form-control rounded-3" name="nombre" [(ngModel)]="empleadoActual.nombre" required>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label small fw-bold text-muted">Apellido *</label>
+                                <input type="text" class="form-control rounded-3" name="apellido" [(ngModel)]="empleadoActual.apellido" required>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label small fw-bold text-muted">DNI *</label>
+                                <input type="text" class="form-control rounded-3" name="dni" [(ngModel)]="empleadoActual.dni" required>
+                            </div>
+
+                            <div class="mb-4">
+                                <label class="form-label small fw-bold text-muted">Email *</label>
+                                
+                                <input type="email" class="form-control rounded-3" name="email" 
+                                    [(ngModel)]="empleadoActual.email" 
+                                    required 
+                                    pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$"
+                                    placeholder="ejemplo@correo.com"
+                                    #emailCtrl="ngModel">
+
+                                <div *ngIf="emailCtrl.invalid && (emailCtrl.dirty || emailCtrl.touched)" class="text-danger small mt-1 fw-bold">
+                                    <div *ngIf="emailCtrl.errors?.['required']">
+                                        <i class="bi bi-exclamation-circle me-1"></i> El email es obligatorio.
+                                    </div>
+                                    <div *ngIf="emailCtrl.errors?.['pattern']">
+                                        <i class="bi bi-exclamation-circle me-1"></i> Ingrese un correo válido (debe contener @ y un dominio como .com).
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="d-grid gap-2">
+                                <button type="submit" class="btn btn-info btn-lg text-white fw-bold rounded-3 shadow-sm" [disabled]="formEmpleado.invalid">
+                                    <i class="bi bi-check-circle me-1"></i> Registrar Empleado
+                                </button>
+                            </div>
+
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-8">
+                <div class="card shadow-sm border-0 rounded-4 overflow-hidden">
+                    <div class="card-header bg-dark text-white py-3">
+                        <h5 class="mb-0 fw-bold"><i class="bi bi-people-fill me-2"></i>Empleados Registrados</h5>
+                    </div>
+                    
+                    <div class="table-responsive">
+                        <div class="card shadow-sm border-0 rounded-4 p-4 mb-4 bg-white">
+                    <h5 class="fw-bold text-dark mb-3"><i class="bi bi-search me-2 text-info"></i>Buscar Empleado Específico</h5>
+                    <div class="row g-3 align-items-end">
+                        <div class="col-12 col-md-8">
+                            <label class="form-label small fw-bold text-muted">Ingrese el ID del Empleado</label>
+                            <input type="number" class="form-control form-control-lg rounded-3" [(ngModel)]="idBusqueda" placeholder="Ej: 1">
+                        </div>
+                        <div class="col-12 col-md-4 d-grid">
+                            <button class="btn btn-dark btn-lg fw-bold rounded-3 shadow-sm" 
+                                    (click)="buscarEmpleadoPorId()" 
+                                    [disabled]="!idBusqueda"
+                                    data-bs-toggle="modal" data-bs-target="#empleadoModal">
+                                <i class="bi bi-search me-2 text-info"></i>Buscar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                        <table class="table table-hover align-middle mb-0 bg-white">
+                            <thead class="table-light">
+                                <tr>
+                                    <th scope="col" style="width: 10%">ID</th>
+                                    <th scope="col" style="width: 35%">Empleado</th>
+                                    <th scope="col" style="width: 25%">DNI</th>
+                                    <th scope="col" style="width: 30%">Email</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                
+                                <tr *ngFor="let emp of empleados">
+                                    <td class="fw-bold text-muted">#{{ emp.id }}</td>
+                                    
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="bg-light border rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 45px; height: 45px;">
+                                                <i class="bi bi-person text-info fs-4"></i>
+                                            </div>
+                                            <div>
+                                                <span class="fw-bold text-dark d-block fs-6">{{ emp.apellido }}</span>
+                                                <small class="text-muted">{{ emp.nombre }}</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="text-muted">{{ emp.dni }}</td>
+                                    <td class="text-primary small">{{ emp.email }}</td>
+                                </tr>
+                                <tr *ngIf="empleados.length === 0">
+                                    <td colspan="4" class="text-center text-muted py-5">
+                                        <i class="bi bi-info-circle fs-2 mb-2 d-block text-secondary"></i>
+                                        <span class="fw-semibold">No hay empleados registrados en el sistema.</span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <div class="modal fade" id="empleadoModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+            
+            <div class="modal-header bg-dark text-white py-3" style="border-bottom: 3px solid #0dcaf0;">
+                <h5 class="modal-title fw-bold">
+                    <i class="bi bi-id-card text-info me-2"></i> Resultado de Búsqueda
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body bg-light p-4">
+                
+                <div *ngIf="cargandoModal" class="text-center py-4">
+                    <div class="spinner-border text-info mb-2" role="status"></div>
+                    <p class="text-muted small mb-0">Buscando datos en el servidor...</p>
+                </div>
+
+                <div *ngIf="!cargandoModal && errorBusqueda" class="text-center py-4 text-muted">
+                    <i class="bi bi-exclamation-triangle fs-1 text-warning mb-2 d-block"></i>
+                    <h5 class="fw-bold text-dark">Empleado no encontrado</h5>
+                    <p class="mb-0">No existe ningún empleado registrado con el ID #{{ idBusqueda }}.</p>
+                </div>
+
+                <div *ngIf="!cargandoModal && empleadoSeleccionado && !errorBusqueda" class="text-center">
+                    <div class="bg-info text-white rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3 shadow-sm" style="width: 70px; height: 70px;">
+                        <i class="bi bi-person-fill fs-1"></i>
+                    </div>
+                    <h3 class="fw-bold text-dark mb-1">{{ empleadoSeleccionado.apellido }}, {{ empleadoSeleccionado.nombre }}</h3>
+                    <p class="text-muted mb-4 small">ID del Registro: #{{ empleadoSeleccionado.id }}</p>
+
+                    <div class="bg-white rounded-3 p-3 shadow-sm text-start">
+                        <div class="mb-2 border-bottom pb-2">
+                            <span class="text-muted d-block small fw-bold">DOCUMENTO ÚNICO</span>
+                            <span class="text-dark fw-semibold"><i class="bi bi-patch-check text-success me-2"></i>{{ empleadoSeleccionado.dni }}</span>
+                        </div>
+                        <div class="mb-0">
+                            <span class="text-muted d-block small fw-bold">CORREO ELECTRÓNICO</span>
+                            <span class="text-primary fw-semibold"><i class="bi bi-envelope text-info me-2"></i>{{ empleadoSeleccionado.email }}</span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            
+            <div class="modal-footer bg-white border-top-0">
+                <button type="button" class="btn btn-outline-dark fw-bold rounded-pill px-4" data-bs-dismiss="modal">Cerrar</button>
+            </div>
+
+        </div>
+    </div>
+    </div>
+
+</main>
